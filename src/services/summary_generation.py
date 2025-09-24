@@ -38,6 +38,8 @@ class SummaryConfig:
     overlap_chars: int = 800
     max_reduce_passes: int = 3
     temperature: float = 0.2
+    embed_model: str = "text-embedding-3-large"  # 3072 dims
+    qdrant_collection: str = os.getenv("QDRANT_COLLECTION", "documents")
 
 
 def _read_bytes_from_http(url: str, timeout_sec: int = 60) -> bytes:
@@ -253,6 +255,54 @@ def generate_narration_summary(url: str, config: Optional[SummaryConfig] = None)
     final_summary = partials[0] if partials else ""
     if not final_summary:
         raise SummaryGenerationError("Failed to generate summary.")
+    # Index into Qdrant: embed chunks + summary
+    try:
+        from qdrant_service import QdrantConfig, get_qdrant_client, upsert_points
+
+
+        qcfg = QdrantConfig(
+            collection_name=cfg.qdrant_collection,
+            vector_size=3072,
+        )
+        qclient = get_qdrant_client(qcfg)
+
+        # Embed all chunks and the final summary
+        texts_to_embed = chunks + [final_summary]
+        embeddings = client.embeddings.create(
+            model=cfg.embed_model,
+            input=texts_to_embed,
+        )
+        vectors = [item.embedding for item in embeddings.data]
+        payloads = []
+        ids = []
+        doc_id = os.getenv("DOC_ID") or os.path.basename(url) or "unknown"
+        for idx, content in enumerate(chunks):
+            payloads.append(
+                {
+                    "type": "chunk",
+                    "doc_id": doc_id,
+                    "chunk_index": idx,
+                    "source_url": url,
+                    "text": content,
+                }
+            )
+            ids.append(idx)
+        payloads.append(
+            {
+                "type": "summary",
+                "doc_id": doc_id,
+                "chunk_index": -1,
+                "source_url": url,
+                "text": final_summary,
+            }
+        )
+        ids.append(len(ids))
+
+        upsert_points(qclient, qcfg, vectors=vectors, payloads=payloads, ids=ids)
+    except Exception as _:
+        # Non-fatal: if Qdrant/indexing fails, we still return the summary
+        print(f"Error in storing data to vector database: {_}")
+        pass
     return final_summary
 
 
