@@ -1,6 +1,6 @@
 """Data models for video narration generation."""
 
-from typing import List, Optional
+from typing import List
 from pydantic import BaseModel, Field
 from datetime import datetime
 
@@ -9,7 +9,7 @@ class Summary(BaseModel):
     title: str
     content: str
     estimated_duration: int = 5
-    attendee: Optional[str] = None
+    attendee: str = None
 
 
 class Slide(BaseModel):

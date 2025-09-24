@@ -87,8 +87,8 @@ class GeminiClient:
 
 Duration: {summary.estimated_duration} minutes
 Content: {summary.content}
-
-Create knowledge transfer presentation narration based on the provided content. Structure into logical slides (maximum 10-15 slides). Make narration conversational and engaging.
+Attendee: {summary.attendee}
+Create knowledge transfer presentation narration based on the provided content. Structure into logical slides (maximum 10-15 slides). Make narration conversational and engaging. Use the attendee's name in the narration to make it more engaging. The conversation should be in natural language and it should not feel like a script. Do not hallucinate any extra content. Only use the content provided in the summary.
 
 Output format:
 title: Presentation Title  

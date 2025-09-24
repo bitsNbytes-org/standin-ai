@@ -19,7 +19,8 @@ The Employee Handbook at KeyValue Software Systems serves as a vital resource, d
 - Confidentiality of contract details is mandatory.
 
 """,
-        estimated_duration=1
+        estimated_duration=1,
+        attendee="John"
     )
     
     generator = NarrationGenerator()
