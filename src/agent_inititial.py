@@ -64,7 +64,7 @@ Narration Style
 
 Narrate step by step, following the narration plan.
 
-After each section, pause briefly for possible interruptions.
+After each section, take a pause ask for any questions 
 
 If no one interrupts, continue narrating automatically.
 
@@ -178,8 +178,9 @@ def create_graph() -> StateGraph:
 async def entrypoint(ctx: JobContext):
     graph = create_graph()
 
+    # get user name from api data
     agent = Agent(
-        instructions="You are an AI agent providing knowledge transfer.",
+        instructions="You are an AI agent providing knowledge transfer. You are talking to nishanth, say hi and ask how are you, Wait for their answer then explain your topic",
         llm=langchain.LLMAdapter(graph),
     )
 
@@ -202,7 +203,7 @@ async def entrypoint(ctx: JobContext):
         ),
     )
     # Start the knowledge transfer session
-    #await session.generate_reply(instructions="Welcome! I'm here to provide knowledge transfer about ABC Pvt. Ltd. HR policies. Let me start by giving you an overview of our HR framework. You can say 'exit' anytime to end this session.")
+    #await session.generate_reply(instructions="Welcome! I'm here to provide knowledge transfer. Let me start by giving you an overview of our HR framework. You can say 'exit' anytime to end this session.")
 
 
 if __name__ == "__main__":
