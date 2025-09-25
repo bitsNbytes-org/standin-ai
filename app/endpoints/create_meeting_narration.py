@@ -420,27 +420,22 @@ def run_pipeline():
         logger.info("- Implement FastAPI endpoints using these services")
         logger.info("- Create search endpoints for document retrieval")
 
-        return 0
+        return {
+            "status": "completed",
+            "narration":narration
+        }
 
     except Exception as e:
         logger.error(f"Workflow failed: {e}", exc_info=True)
         return 1
 
 
-if __name__ == "__main__":
-    exit_code = main()
-    sys.exit(exit_code)
 
 
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 from models.models import MeetingCreationRequest
 meeting_router = APIRouter()
-
-
-@meeting_router.get("/create-meeting-narrations", tags=["Health"])
-async def meeting_router(req: MeetingCreationRequest):
-    return run_pipeline(req)
 
 
 # app/endpoints/create_meeting_narration.py
@@ -459,8 +454,6 @@ class MeetingRequest(BaseModel):
 
 @meeting_router.post("/create_meeting_narration")
 def create_meeting_narration(req: MeetingRequest):
-    run_pipeline()
+    return run_pipeline()
     # replace with your actual function call
-    return {
-        "message": f"Narration created for {req.attendee} ({req.duration} mins) with doc {req.url}"
-    }
+    
