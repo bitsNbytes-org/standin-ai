@@ -1,6 +1,6 @@
 from typing import List
-from .models import Summary, Slide, NarrationResult
-from .gemini_client import GeminiClient
+from models import Summary, Slide, NarrationResult
+from .gemini_service import GeminiClient
 import json
 import os
 
