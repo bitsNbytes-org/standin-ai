@@ -1,15 +1,17 @@
 import logging
 import json
-from typing import Annotated, TypedDict
+from typing import Annotated, TypedDict, List
+from langchain_openai import ChatOpenAI
+from pydantic import BaseModel
 
 from dotenv import load_dotenv
 from langchain.chat_models import init_chat_model
-from langchain_core.messages import BaseMessage, ToolMessage
+from langchain_core.messages import BaseMessage, ToolMessage, AIMessage, HumanMessage, SystemMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.tools import tool
 from langgraph.graph import START, StateGraph
 from langgraph.graph.message import add_messages
-from prompts import SYSTEM_PROMPT, NARRATION_PLAN
+from prompts import SYSTEM_PROMPT
 from livekit.agents import (
     Agent,
     AgentSession,
@@ -24,22 +26,21 @@ from livekit.plugins.turn_detector.multilingual import MultilingualModel
 from livekit.plugins import noise_cancellation
 
 logger = logging.getLogger("basic-agent")
+roomContext = None
 
 load_dotenv()
 
 # pip install langchain langgraph openai
 
-from typing import TypedDict, List
-from langchain_openai import ChatOpenAI
-from langchain.schema import SystemMessage, HumanMessage, AIMessage, BaseMessage
-from langgraph.graph import StateGraph
 
 # -----------------------------
 # 1. Define state
 # -----------------------------
 class AgentState(TypedDict):
     messages: Annotated[List[BaseMessage], add_messages]
-
+class Slide(BaseModel):
+    text: str
+    slide_number: int
 # -----------------------------
 # 2. Create LLM + prompt template
 @tool
@@ -52,7 +53,29 @@ ABC Pvt. Ltd. currently holds an estimated 2.5% of the global IT services market
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 llm_with_tools = llm.bind_tools([query_vector_db])
 tools_by_name = {"query_vector_db": query_vector_db}
-l
+
+def get_narration_plan():
+    with open("output/presentation_data.json", "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    narration_plan = []
+    for slide in data.get("slides", []):
+        narration_plan.append(
+            f"(Slide {slide['slide_number']})\nNarrator: {slide['narration_text']}\n"
+        )
+    return "\n".join(narration_plan)
+def get_slide_json(slide_number: int):
+    with open("output/presentation_data.json", "r", encoding="utf-8") as f:
+        data = json.load(f)
+    slides = data.get("slides", [])
+    return slides[int(slide_number)-1]["slide_json"] 
+def send_data_to_room(data: dict):
+
+    data_dict = {"type": "chat", "message": data, "sender": "agent"}
+    json_data = json.dumps(data_dict)
+    json_bytes = json_data.encode('utf-8')
+    room = roomContext.room
+    room.local_participant.publishData(json_bytes, reliable=True, topic="json")
 # -----------------------------
 # 3. Define nodes
 # -----------------------------
@@ -73,9 +96,10 @@ def call_llm(state: AgentState) -> AgentState:
                 return {"messages": [AIMessage(content=goodbye_message)]}
     
     # Build the conversation with system prompt and narration plan
+    narration_plan = get_narration_plan()
     conversation = [
         SystemMessage(content=SYSTEM_PROMPT),
-        SystemMessage(content=f"NARRATION_PLAN:\n{NARRATION_PLAN}")
+        SystemMessage(content=f"NARRATION_PLAN:\n{narration_plan}")
     ] + state["messages"]
     print(state["messages"])
     # Get response from LLM
@@ -98,11 +122,15 @@ def call_llm(state: AgentState) -> AgentState:
                 tool_call_id=tool_id,
             )
         )
+        
+    structured_llm = llm.with_structured_output(Slide)
+    response = structured_llm.invoke(state["messages"])
+    response_text = response.text
+    print("response", response_text)
 
-        response = llm.invoke(state["messages"])
-    
-    
-    return {"messages": [AIMessage(content=response.content)]}
+   
+    # send_data_to_room(get_slide_json(response.slide_number))
+    return {"messages": [AIMessage(content=response.text)]}
 
 
 def prewarm(proc: JobProcess):
@@ -125,6 +153,8 @@ def create_graph() -> StateGraph:
 
 
 async def entrypoint(ctx: JobContext):
+    global roomContext
+    roomContext = ctx
     graph = create_graph()
 
     agent = Agent(
