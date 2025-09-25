@@ -1,4 +1,4 @@
-"""Integrated workflow for summary generation and vector storage."""
+# """Integrated workflow for summary generation and vector storage."""
 
 import os
 import sys
@@ -8,14 +8,15 @@ from typing import Optional, Dict, Any
 from pathlib import Path
 from dataclasses import asdict
 import qdrant_client
+
 # Add src to path for direct execution
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from models import Summary
-from models import SummaryConfig, QdrantConfig
-from services.summary_service import SummaryService
-from services.qdrant_service import QdrantService
-from services.narration_gen_service import NarrationGenerator
+from models.models import Summary
+from models.models import SummaryConfig, QdrantConfig
+from service.summary_service import SummaryService
+from service.qdrant_service import QdrantService
+from service.narration_gen_service import NarrationGenerator
 
 
 class MeetingContentGenerationPipeline:
@@ -49,7 +50,6 @@ class MeetingContentGenerationPipeline:
             self.logger.info(
                 "MeetingContentGenerationPipeline initialized successfully"
             )
-
 
         except Exception as e:
             self.logger.error(
@@ -285,7 +285,7 @@ class MeetingContentGenerationPipeline:
 
         # Check summary service (basic validation)
         try:
-            if self.summary_service :
+            if self.summary_service:
                 health_status["services"]["summary"] = {
                     "status": "healthy",
                     "model": self.summary_config.model,
@@ -331,7 +331,7 @@ def setup_logging() -> logging.Logger:
     return logging.getLogger(__name__)
 
 
-def main():
+def run_pipeline():
     """Main function demonstrating the integrated workflow."""
     logger = setup_logging()
     logger.info("=== Starting Integrated Document Processing Workflow ===")
@@ -430,3 +430,37 @@ def main():
 if __name__ == "__main__":
     exit_code = main()
     sys.exit(exit_code)
+
+
+from fastapi import APIRouter
+from fastapi.responses import JSONResponse
+from models.models import MeetingCreationRequest
+meeting_router = APIRouter()
+
+
+@meeting_router.get("/create-meeting-narrations", tags=["Health"])
+async def meeting_router(req: MeetingCreationRequest):
+    return run_pipeline(req)
+
+
+# app/endpoints/create_meeting_narration.py
+
+from fastapi import APIRouter
+from pydantic import BaseModel
+
+meeting_router = APIRouter()
+
+
+class MeetingRequest(BaseModel):
+    url: str
+    attendee: str
+    duration: int
+
+
+@meeting_router.post("/create_meeting_narration")
+def create_meeting_narration(req: MeetingRequest):
+    run_pipeline()
+    # replace with your actual function call
+    return {
+        "message": f"Narration created for {req.attendee} ({req.duration} mins) with doc {req.url}"
+    }

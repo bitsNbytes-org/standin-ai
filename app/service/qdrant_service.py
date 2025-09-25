@@ -14,7 +14,7 @@ from qdrant_client.http.exceptions import UnexpectedResponse
 
 # Add src to path for direct execution
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from models import QdrantConfig, DocumentEmbedding, SearchResult
+from models.models import QdrantConfig, DocumentEmbedding, SearchResult
 
 dotenv.load_dotenv()
 

@@ -1,0 +1,144 @@
+Employee Handbook - Latest
+
+
+
+By Reshmi Suman Varghese
+
+11 min
+
+143
+
+Add a reaction
+Employee Handbook - Rule & Regulations
+
+Terms of Employment – The terms would be as per the details mentioned in the offer letter received. KeyValue Software Systems (hereby, referred to as company) reserves the right to amend, alter, change any or all the terms and conditions governing employment. The company will also be the sole judge of the meaning and interpretation of all or any of these terms and conditions and its decision thereon shall be binding on all employees. The employment contract is a contract between the individual employee and the company and the terms of contract are individual to each employee. Hence, all employees are required not to share the terms of contract with others including fellow employees.
+
+Joining Process – Appointment letter released from HRD needs to be countersigned and shared back as a confirmation before your joining. New joiners are expected to share few documents prior to their onboarding as per the mail sent from HRD.
+
+Non Disclosure Agreement (NDA) – It is a legally binding agreement - a signed contract that agrees not to disclose any info related to projects or customers to anyone.
+
+Probation – We would get in touch with your team leads & team members to know more about you especially during the first 3 months. We may decide to extend your probation period in case performance is found unsatisfactory. Probation period is 3 months.
+
+Timings - Timings are flexible. We trust you and believe that you will be responsible. We are flexible but should have a culture of self-discipline. Incase of unavailability due to any unforeseen reasons, your team needs to be updated about your absence. Employees are expected to be accessible via phone and in slack throughout the workday.
+
+Hybrid – We follow Hybrid model were in Monday and Friday we can opt Work from Home and Tuesday to Thursday we are to work from office mandatory. Employees below 1 year of experience are to work from office on all work days. They need to ensure they have all the appropriate equipment (functioning laptop) and content required to be fully productive working from home. If this is not the case, they will need to come to office.
+
+Leave – All planned leaves should be informed to your team lead in advance, so they can plan work accordingly. Leaves taken more than 5 days needs to be communicated via mail  to hr-team@keyvalue.systems with a CC to nucleus@keyvalue.systems
+
+(a)   Paid Leaves – 16 days                                         (c) Maternity Leaves – 182 days
+
+(b)   Marriage Leaves – 3 days                                   (d) Paternity Leaves – 5 days
+
+For a new joiner, leaves are calculated on prorate basis from their date of joining.
+
+7.a) A maximum of 30 days leave balance can be carry forwarded and the remaining If any would be encashed to you along with the salary of upcoming month in January
+
+7.b) Paternity and Maternity leaves are special leaves which will be marked from HRD as per communication.
+
+7.c) Leave balance are calculated on June and December every year. For a relieving employee Loss of pay/ encashment will be reflected at the time of their settlement.
+
+Public Holiday – 13 public holidays as per government policy. Holiday list will be shared by the first week of January. In case if the working of the office is hampered on account of strike, power cut, etc the company may declare, a public or a weekly holiday (except national holidays) to be a normal working day and declare the affected day to be a holiday.
+
+Camaraderie – We encourage teams working on projects to cultivate a supportive work environment, foster positive relationships, and promote unity. To facilitate this, the company promotes and encourages team outings and team lunches. These activities provide opportunities for team members to connect, strengthen relationships, and foster a sense of unity in a relaxed and enjoyable setting.
+
+ Holistic well-being  - We have established partnerships to support your well-being. Enjoy these facilities at a discounted rates in a well-equipped gym for your physical health, and access mental health services through our collaboration with a hospital. Your holistic well-being is our priority. For further details regarding this you can connect with Admin & HR Departments to guide and brief you about these facilities.
+
+Conduct and Ethics - Creating a work environment that is inclusive, supportive and free of harassment and unlawful discrimination is required. Treat others with the same respect and dignity that any reasonable person may wish to receive. Harassments are illegal and violates company policies. Actions or words of a sexual nature that harass or intimidate others are prohibited.  Similarly, actions or words that harass or intimidate based on race, colour, religion, gender, sexual orientation, age, national origin, disability, marital status or any other unlawful basis are also prohibited. In case of any Complaint – We have Internal Complaints Committee and Ethics Committee. For further details please refer to our confluence page. 
+Internal Complaints Committee
+ 
+KeyValue - Ethics Committee
+ 
+
+  Travel and Expense policy - Based on the need of the project, employees are entitled to travel to the client’s location (National/ International). Company has a travel policy which will be shared to the employee while he/she is required to travel. Since most of our customers are at international locations and a travel requirement can come up at short notice hence, we request those who do not have a passport to have it in place.
+
+ Internet Use Policy - All users are expected to use good judgment when using the Internet. Company strictly prohibits:
+
+(13.a) Displaying, uploading, downloading, disseminating, participating in bulletin board or electronic forum discussions regarding subject matters containing inappropriate materials or information that may be offensive to others
+
+(13.b) In accordance with the Company's standards of business conduct, hacking or other attempts to penetrate non-public systems or any dishonest, defamatory, fraudulent, immoral, illegal and/or unethical activities
+
+(13.c) Using Company's name or property or a Company-provided Internet access ID to conduct business on behalf of an entity other than Company or on behalf of any individual, including yourself; to represent yourself as someone else; or to solicit Company associates.
+
+(13.d) All users must respect Company's, its affiliates' and third parties' intellectual property rights (patents, copyrights, trademarks, trade secrets, as well as rights of privacy and publicity) and must take precautions to protect software, information and data that are owned, licensed or managed by Company. No software, information or data maybe used or distributed in a manner that infringes upon any intellectual property right or violates a license agreement or jeopardizes Company's trade secrets.
+
+(13.e) No one may conduct business by or on behalf of Company with third parties using
+
+personal access accounts or IDs.
+
+(13.f) Misuse of Company resources and conduct in violation of Company policy will result in disciplinary action in accordance with the Company policy, up to and including termination.
+
+(13.g) You are to use only the company provided laptop/desktop for the work assigned to you. Never use any other system & also do not download any kind of data from the company laptop and use it elsewhere.
+
+(13.h) During your employment and following the cessation of your employment with the Company, you agree that you shall not either directly or indirectly or facilitate a third party to make any disparaging, negative, or defamatory statements, whether written or verbal, on social media platforms, public forums, or any other public medium that specifically mentions or refers to the Company, its Customers, Partners, Management, Employees or its operations. This includes but is not limited to comments, posts, or remarks that could potentially harm the reputation or goodwill of the Company. Any violations shall result in stringent actions which may include termination of employment and/ or legal action including claiming damages or criminal charges.
+
+(13.g) Any System issues, kindly alert the System Admin & never use your personal laptop for work. Do not download anything on the company provided laptop, kindly inform the system admin. To copy work related data, use company hard drive or pen drive only. Client/Product related data – No screenshots or photos to be taken without the consent from the client. No data pertaining to the company/customers to be shared outside. While working remotely –  Ensure you are using a secured network.
+
+(13.h) Security Incident Reporting: A security incident is any event that compromises the confidentiality, integrity, or availability of information, systems, or services, such as data breaches or unauthorised access. How to Report: Identify and document details of the incident, including the date, time, description, affected systems, and actions taken, then report promptly. Where to Report: Send an incident report to security@keyvalue.systems, including all relevant information and any supporting documentation.
+
+14.   Company Assets - Safeguarding and appropriately using Company assets, whether those assets take the form of paper files, electronic data, computer resources, trademarks or otherwise, is critical. Company is committed to preserving customer and employee trust. All information, whether it is business, customer or employee-related, must be treated in a confidential manner, and disclosing it is limited to those people who have an appropriate business or legal reason to have access to the information. Nothing to be downloaded on the laptop provided by the Company, please get in touch with the System Admin for further details. In the absence of the employee at his/her desk, it is the duty of the employee to ensure the computer is locked. Take care of the assets handed over to you – Any damage, cost would be borne by the employee.
+
+15.   Payroll & Investment Declarations – The company uses GreytHR Software tool for HR and Payroll process. The full month salary would be credited on the second last working day of the current month. The salary payment date is subject to potential change due to the occurrence of bank holidays. Payslips will be made available via official mail ids through GreytHR portal by the first week of the upcoming month. For new joiners, GreytHR login credentials will be shared to you in your official mail ids. Those who have investments and are likely to fall under tax slabs are required to fill in previous employer tax computation details and declare your investments through GreytHR. The portal will be made open for changes or declarations based on an intimation and mail request sent to Accounts & HR Departments before 15th of that month.
+
+16.   Health Insurance – Maximum health insurance coverage per family is limited to 5 Lakhs. For any assistance you can connect with Fenta Francis / Tomson Thomas. Further guidelines and network hospitals has been shared along with your joining Goodies Mail.
+
+17.   Corporate National Pension Scheme  - NPS is a  unique pension scheme launched by Govt. of India which allows citizens of India, from 18-70 years of age, to effectively plan for their retirement through safe and reasonable market based returns. NPS investment can be in 2 ways: Individual and Corporate NPS. KeyValue has decided to implement Corporate NPS. Employees can make their individual contributions and KeyValue will be contributing up to 10% of basic salary as employer contribution for those who are opting for corporate NPS. Following are the tax benefits of Corporate NPS Scheme:
+
+(17.a) For Old regime - Individuals can avail tax deduction of upto Rs. 1,50,000 u/s 80C by contributing towards NPS (Sec 80CCD(1)). Also, Individuals can avail additional deduction of up to Rs. 50,000 by contributing towards NPS (Sec 80CCD(1B)).
+
+(17.b) For both Old & New regime - in case of corporate NPS, NPS contribution made by employer up to 10% of Salary (Basic+ DA) is deductible from gross taxable salary (Sec 80CCD(2)) and this amount is eligible for tax deduction 
+
+The process for opting for Corporate NPS
+
+(17.1) Create an NPS account - through your ICICI phone app or net banking (if your salary account is ICICI). For others, you can follow the steps here - https://www.npscra.nsdl.co.in/steps-to-join-nps.php 
+
+(17.2) Please chose corporate subscriber as subscriber type & select KeyValue Software Systems from the dropdown.
+
+(17.3) Once your PRAN (Permanent Retirement Account Number) is generated, send the PRAN details to accounts@keyvalue.systems & hr@keyvalue.systems stating you would like to opt for corporate NPS. If the PRAN details are sent to us before 15th of the month, NPS would be considered from that month onwards, else from the upcoming month. 10% of your basic will be contributed to NPS by KeyValue.
+
+18.   Employee Development –
+
+(18.a) Performance Evaluation - The process of performance evaluation provides a systematic approach for communicating goals, expectations and objectives to each employee as well as documenting individual performance. The process covers by Goal setting, Performance review and Performance appraisal.
+
+(18.b) Training and Development - The objective of the training and development policy is to develop relevant skills in the organization taking into account - Organizational requirements, Functional requirements and Individual learning objectives. It will be the responsibility of the supervisor/manager to ensure that all employees get an equal opportunity to attend training programs based on their individual training needs. For honing your technical skills our employees conduct Knowledge Transfer (KT) sessions, Give & Take (G&T) which will award you bounty points. We also do Product Tear Down and Product 360 sessions, Chapters and to provide comprehensive insights into our products and technologies. We have a well-stocked library and a curated list of Udemy courses made available to support your continuous learning and personal development.
+
+(18.c) Career Development - It will be the endeavour of the Company management to provide all its employees with the opportunity for personal growth and progress. It will be the intention of the Company to provide all employees with growth and development opportunities. All career progression opportunities will be contingent upon the existing vacancies but it will not be binding on the Company to promote an employee. All matters with respect to promotions and career progression will be the responsibility of the Company management
+
+19.   Employee Separation - An employee will be separated from the company either on his/her resignation from the services of the company/ on being removed from the services or on being dismissed by the company/ on the expiry of any fixed contract period/ on being found medically unfit to continue working in his/her present responsibility.
+
+20.   Resignation - An employee, who wishes to leave the services of the company, has to discuss with the management first and further proceed in submitting a resignation letter serving as stipulated in his/her appointment letter, to his/her immediate manager and a copy of the same to the management & HRD. The notice period from the employee is essential for the company to ensure timely and smooth hand over of existing responsibilities to another employee. Leave are not encouraged while serving the notice period. Eligible leaves shall be modified on a prorate basis based on the last working day. Any exception needs to be discussed with the HRD. On acceptance of resignation, a communication in writing shall be given to the employee with a copy to Accounts and other related departments for his/her full and final settlement of dues. The payment of other dues after ensuring clearance of outstanding amounts like travel allowance bills will be done. Company assets like computers, monitor, other computer assets need to be handed-over to the System Admin. The Full and Final settlement would be done on the last working day on the month. Gratuity will be payable if the employee complete 5 years with the company.  
+
+21.   Dismissal - An employee’s services may be terminated due to lack of job-related skills, inadequate work performance, improper character or attitude, integrity issues, or any other reason that the company believes renders the employee unsuitable for continuing employment with the company. Under such circumstances, the employee's services may be terminated without notice. The appointment of an employee is made on the basis of the information supplied by him/her in his/her application/résumé at the time of interview, and his/her appointment shall stand null and void in case any material error is established at any point of time. In such a case, his/her services shall be terminated with immediate effect. The clearance formalities will be similar as those mentioned in resignations.
+
+22.   General Information –
+
+(22.a) Referrals - The people whom you wish to refer to our family, you can send in their resumes to - referrals@keyvalue.systems once the referred person joins us, you will be paid referral bonus once the person you referred completes his probation period & it will be paid along with that month salary.
+
+For Tech roles referral bonus -
+
+1-5 years experienced candidate - Rs. 50K 
+
+5 years and above experienced candidate - Rs. 1L
+
+Non-Tech roles referral bonus (Admin, Accounts, Business Development, Content Writer, Marketing, HR, Sales...) 
+
+1-5 years experienced candidate - Rs. 15K 
+
+5 years and above experienced candidate - Rs. 30K
+
+(22.b) Admins to reach out for system related issues – 
+
+Richald – +91 89434 39313, richald@keyvalue.systems  
+
+Amal Thomas - +91 70340 99393, amal.t@keyvalue.systems
+
+(22.c) Accounts related Queries –
+
+Elizabeth Aji - +91 82818 87328, elizabeth@keyvalue.systems
+
+Ann Maria - +91 77362 29994, annmaria@keyvalue.systems
+
+(22.d) HR related Queries–
+
+Midhu Cheriyan - +91 82814 75954, midhu@keyvalue.systems
+
+Reshmi Suman Varghese - + 91 97478 52782, reshmi@keyvalue.systems

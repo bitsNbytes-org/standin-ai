@@ -91,3 +91,9 @@ class NarrationResult(BaseModel):
     title: str
     slides: List[Slide]
     created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class MeetingCreationRequest(BaseModel):
+    """Request model for creating a meeting."""
+    content: str
+    duration:str = 30
+    attendee: Optional[str] = None

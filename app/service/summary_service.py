@@ -27,7 +27,7 @@ try:
     from .qdrant_service import QdrantService
 except ImportError:
     # Fallback for direct execution
-    from models import (
+    from models.models import (
         SummaryConfig, 
         SummaryResult, 
         DocumentType,

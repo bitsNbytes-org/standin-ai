@@ -3,8 +3,8 @@ import os
 from typing import Dict, Any, Optional
 from google import genai
 from google.genai import types
-from config import get_settings
-from models import Summary
+from core.config import get_settings
+from models.models import Summary
 
 class GeminiClient:
     
