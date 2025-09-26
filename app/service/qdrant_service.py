@@ -191,9 +191,9 @@ class QdrantService:
         try:
             collection = self.client.get_collection(self.config.collection_name)
             return {
-                "name": collection.config.params.vectors.size,
-                "vector_size": collection.config.params.vectors.size,
-                "distance": collection.config.params.vectors.distance,
+                "name": self.config.collection_name,
+                "vector_size": self.config.vector_size,
+                "distance": self.config.distance,
                 "points_count": collection.points_count,
             }
         except Exception:

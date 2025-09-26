@@ -168,13 +168,13 @@ class DocumentProcessor:
 
 class SummaryService:
     """Service for generating document summaries."""
-    
+
     def __init__(self, config: Optional[SummaryConfig] = None, qdrant_service: Optional[QdrantService] = None):
         """Initialize summary service."""
         self.config = config or SummaryConfig()
         self.qdrant_service = qdrant_service
         self._openai_client = None
-    
+
     @property
     def openai_client(self) -> OpenAI:
         """Get OpenAI client (lazy initialization)."""
@@ -186,30 +186,30 @@ class SummaryService:
                 )
             self._openai_client = OpenAI(api_key=api_key)
         return self._openai_client
-    
+
     def _chunk_text(self, text: str) -> List[str]:
         """Chunk text into manageable pieces."""
         if len(text) <= self.config.max_input_chars_per_chunk:
             return [text]
-        
+
         chunks: List[str] = []
         start = 0
         end = len(text)
-        
+
         while start < end:
             chunk_end = min(end, start + self.config.max_input_chars_per_chunk)
             chunk = text[start:chunk_end]
             chunks.append(chunk)
-            
+
             if chunk_end >= end:
                 break
-            
+
             start = chunk_end - self.config.overlap_chars
             if start < 0:
                 start = 0
-        
+
         return chunks
-    
+
     def _map_summarize(self, chunk: str) -> str:
         """Summarize a single chunk."""
         system_prompt = (
@@ -223,7 +223,7 @@ class SummaryService:
             "one-sentence high-level overview, and callouts for critical quotes or figures.\n\n"
             f"CONTENT:\n{chunk}"
         )
-        
+
         completion = self.openai_client.chat.completions.create(
             model=self.config.model,
             temperature=self.config.temperature,
@@ -233,7 +233,7 @@ class SummaryService:
             ],
         )
         return (completion.choices[0].message.content or "").strip()
-    
+
     def _reduce_summaries(self, partial_summaries: List[str]) -> str:
         """Merge partial summaries into a single summary."""
         system_prompt = (
@@ -248,7 +248,7 @@ class SummaryService:
             "headings, (3) concise bullet points for details, (4) conclusion with key "
             "takeaways.\n\nPARTIAL SUMMARIES:\n\n" + joined
         )
-        
+
         completion = self.openai_client.chat.completions.create(
             model=self.config.model,
             temperature=self.config.temperature,
@@ -258,7 +258,7 @@ class SummaryService:
             ],
         )
         return (completion.choices[0].message.content or "").strip()
-    
+
     def _generate_embeddings(self, texts: List[str]) -> List[List[float]]:
         """Generate embeddings for texts."""
         embeddings = self.openai_client.embeddings.create(
@@ -266,26 +266,26 @@ class SummaryService:
             input=texts,
         )
         return [item.embedding for item in embeddings.data]
-    
-    def generate_summary(self, url: str, doc_id: Optional[str] = None) -> SummaryResult:
+
+    def generate_summary(self, content_to_narration: str, doc_id: Optional[str] = None) -> SummaryResult:
         """Generate summary for a document."""
         start_time = time.time()
-        
+
         # Extract text from document
-        data = DocumentProcessor.fetch_bytes(url)
-        text = DocumentProcessor.extract_text(data, url)
-        
+
+        text = content_to_narration
+
         if not text.strip():
             raise SummaryGenerationError("No extractable text found in the provided document.")
-        
+
         # Chunk text
         chunks = self._chunk_text(text)
-        
+
         # Map step: summarize each chunk
         partials: List[str] = []
         for chunk in chunks:
             partials.append(self._map_summarize(chunk))
-        
+
         # Reduce step: iteratively merge until one remains or max passes reached
         passes = 0
         while len(partials) > 1 and passes < self.config.max_reduce_passes:
@@ -295,62 +295,60 @@ class SummaryService:
                 merged.append(self._reduce_summaries(group))
             partials = merged
             passes += 1
-        
+
         final_summary = partials[0] if partials else ""
         if not final_summary:
             raise SummaryGenerationError("Failed to generate summary.")
-        
+
         # Store in vector database if Qdrant service is available
         if self.qdrant_service:
             try:
-                self._store_in_vector_db(chunks, final_summary, url, doc_id)
+                self._store_in_vector_db(chunks, final_summary, doc_id)
             except Exception as e:
                 print(f"Error storing in vector database: {e}")
-        
+
         processing_time = time.time() - start_time
-        
+
         return SummaryResult(
             summary=final_summary,
             chunks=chunks,
-            doc_id=doc_id or os.path.basename(url) or "unknown",
-            source_url=url,
+            doc_id=doc_id or "unknown",
+            source_url="jknown",
             processing_time=processing_time
         )
-    
-    def _store_in_vector_db(self, chunks: List[str], summary: str, url: str, doc_id: Optional[str]) -> None:
+
+    def _store_in_vector_db(self, chunks: List[str], summary: str, doc_id: Optional[str]) -> None:
         """Store chunks and summary in vector database."""
         if not self.qdrant_service:
             return
-        
+
         # Generate embeddings
         texts_to_embed = chunks + [summary]
         vectors = self._generate_embeddings(texts_to_embed)
-        
+
         # Prepare payloads and IDs
         payloads = []
         ids = []
         final_doc_id = doc_id or os.path.basename(url) or "unknown"
-        
+
         # Add chunk payloads
         for idx, content in enumerate(chunks):
             payloads.append({
                 "type": "chunk",
                 "doc_id": final_doc_id,
                 "chunk_index": idx,
-                "source_url": url,
                 "text": content,
             })
             ids.append(idx)
-        
+
         # Add summary payload
         payloads.append({
             "type": "summary",
             "doc_id": final_doc_id,
             "chunk_index": -1,
-            "source_url": url,
             "text": summary,
         })
         ids.append(len(chunks))
-        
+
         # Upsert to Qdrant
         self.qdrant_service.upsert_embeddings(vectors, payloads, ids)

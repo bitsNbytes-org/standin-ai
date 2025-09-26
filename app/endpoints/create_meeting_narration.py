@@ -4,10 +4,11 @@ import os
 import sys
 import time
 import logging
-from typing import Optional, Dict, Any
+from typing import List, Optional, Dict, Any
 from pathlib import Path
 from dataclasses import asdict
 import qdrant_client
+import uuid
 
 # Add src to path for direct execution
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -77,7 +78,10 @@ class MeetingContentGenerationPipeline:
         return logger
 
     def process_document(
-        self, url: str, doc_id: Optional[str] = None, store_vectors: bool = True
+        self,
+        content_to_narration: str,
+        doc_id: Optional[str] = None,
+        store_vectors: bool = True,
     ) -> Dict[str, Any]:
         """
         Process a document: extract text, generate summary, and store in vector DB.
@@ -92,14 +96,14 @@ class MeetingContentGenerationPipeline:
         """
         start_time = time.time()
 
-        self.logger.info(f"Starting document processing: {url}")
+        self.logger.info(f"Starting document processing: {doc_id or 'no-id'}")
         self.logger.debug(
             f"Parameters - doc_id: {doc_id}, store_vectors: {store_vectors}"
         )
 
         try:
             # Validate inputs
-            if not url or not isinstance(url, str):
+            if not content_to_narration:
                 raise ValueError("URL must be a non-empty string")
 
             # Generate summary (this will also store in vector DB if enabled)
@@ -111,7 +115,7 @@ class MeetingContentGenerationPipeline:
                 original_qdrant_service = self.summary_service.qdrant_service
                 self.summary_service.qdrant_service = None
 
-            result = self.summary_service.generate_summary(url, doc_id)
+            result = self.summary_service.generate_summary(content_to_narration, doc_id)
 
             # Restore Qdrant service if it was temporarily disabled
             if original_qdrant_service is not None:
@@ -141,7 +145,7 @@ class MeetingContentGenerationPipeline:
 
         except Exception as e:
             processing_time = time.time() - start_time
-            error_msg = f"Failed to process document {url}: {str(e)}"
+            error_msg = f"Failed to process text: {str(e)}"
             self.logger.error(error_msg, exc_info=True)
 
             return {
@@ -149,7 +153,7 @@ class MeetingContentGenerationPipeline:
                 "error": str(e),
                 "processing_time": round(processing_time, 3),
                 "doc_id": doc_id,
-                "source_url": url,
+                "source_url": '20',
             }
 
     def search_similar_documents(
@@ -331,7 +335,7 @@ def setup_logging() -> logging.Logger:
     return logging.getLogger(__name__)
 
 
-def run_pipeline():
+def run_pipeline(content_json_array):
     """Main function demonstrating the integrated workflow."""
     logger = setup_logging()
     logger.info("=== Starting Integrated Document Processing Workflow ===")
@@ -370,14 +374,15 @@ def run_pipeline():
             logger.error(f"Health status: {health}")
 
         # Example document processing
-        document_url = os.getenv(
-            "DEMO_DOCUMENT_URL",
-            "/home/mathewvkariath/Desktop/keycode_25/standin-ai/confluence.txt",
-        )
 
         logger.info("Processing demo document...")
+        content_to_narration = ""
+        for doc in content_json_array:
+            content_to_narration += f"Doctype: {doc.source},Content: {doc.content}\n"
         result = processor.process_document(
-            url=document_url, doc_id="demo-doc-1", store_vectors=True
+            content_to_narration=content_to_narration,
+            doc_id = str(uuid.uuid4()) ,
+            store_vectors=True,
         )
 
         if result["success"]:
@@ -419,7 +424,6 @@ def run_pipeline():
         logger.info("Next steps:")
         logger.info("- Implement FastAPI endpoints using these services")
         logger.info("- Create search endpoints for document retrieval")
-
         return {
             "status": "completed",
             "narration":narration
@@ -428,8 +432,6 @@ def run_pipeline():
     except Exception as e:
         logger.error(f"Workflow failed: {e}", exc_info=True)
         return 1
-
-
 
 
 from fastapi import APIRouter
@@ -446,14 +448,21 @@ from pydantic import BaseModel
 meeting_router = APIRouter()
 
 
-class MeetingRequest(BaseModel):
-    url: str
+class Document(BaseModel):
+    page_id: str = "None"
+    title: str ="NO Titles"
+    content: str
+    url: str ="None"
+    source:str = "None"
+
+
+class CreateMeetingPayload(BaseModel):
+    documents: List[Document]
     attendee: str
     duration: int
 
 
 @meeting_router.post("/create_meeting_narration")
-def create_meeting_narration(req: MeetingRequest):
-    return run_pipeline()
+def create_meeting_narration(req: CreateMeetingPayload):
+    return run_pipeline(req.documents)
     # replace with your actual function call
-    
