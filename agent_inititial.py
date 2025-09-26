@@ -1,6 +1,7 @@
 import logging
 import json
-from typing import Annotated, TypedDict
+import os
+from typing import Annotated, TypedDict, List, Dict
 
 from dotenv import load_dotenv
 from langchain.chat_models import init_chat_model
@@ -22,17 +23,53 @@ from livekit.agents import (
 from livekit.plugins import openai, langchain, silero
 from livekit.plugins.turn_detector.multilingual import MultilingualModel
 from livekit.plugins import noise_cancellation
+from qdrant_client import QdrantClient
+from openai import OpenAI
 
 logger = logging.getLogger("basic-agent")
 
 load_dotenv()
 
-# pip install langchain langgraph openai
+# pip install langchain langgraph openai qdrant-client
 
 from typing import TypedDict, List
 from langchain_openai import ChatOpenAI
 from langchain.schema import SystemMessage, HumanMessage, AIMessage, BaseMessage
 from langgraph.graph import StateGraph
+
+# Initialize OpenAI and Qdrant clients
+oai = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+qdrant = QdrantClient(url=os.getenv("QDRANT_URL"), api_key=os.getenv("QDRANT_API_KEY"))
+
+# ------------- RAG helpers -------------
+def embed_query(text: str) -> List[float]:
+    resp = oai.embeddings.create(model=os.getenv("OPENAI_EMBED_MODEL"), input=[text])
+    return resp.data[0].embedding
+
+def retrieve(query: str, k: int = 2) -> List[Dict]:
+    vec = embed_query(query)
+    res = qdrant.query_points(
+        collection_name=os.getenv("QDRANT_COLLECTION"),
+        query=vec,              # the dense vector
+        limit=k,
+        with_payload=True,      # same as before
+        score_threshold=0.2,  # optional, server-side filter
+    )
+    hits = res.points
+    print("hits", hits)
+    out = []
+    for h in hits:
+        payload = h.payload or {}
+        print("payload", payload)
+        chunk = payload.get(os.getenv("TEXT_PAYLOAD_KEY")) or payload.get("chunk") or payload.get("content") or ""
+        if not chunk:
+            continue
+        if h.score is not None and h.score >= 0.2:
+            out.append({
+                "text": chunk
+            })
+    print("\n \n out : ", out)
+    return out
 
 # -----------------------------
 # 1. Define state
@@ -45,14 +82,26 @@ class AgentState(TypedDict):
 @tool
 def query_vector_db(query: str) -> str:
     """Query the vector database for additional context"""
-    return """
-ABC Pvt. Ltd. currently holds an estimated 2.5% of the global IT services market. Over the past five years, its market share has gradually increased from around 1.8% to 2.5%, reflecting steady growth in international client engagements and service offerings.""" 
+    try:
+        results = retrieve(query, k=3)  # Get top 3 results
+        if not results:
+            return "No relevant information found in the knowledge base."
+        
+        # Combine the retrieved chunks into a single context string
+        context_chunks = []
+        for i, result in enumerate(results, 1):
+            context_chunks.append(f"Context {i}: {result['text']}")
+        
+        return "\n\n".join(context_chunks)
+    except Exception as e:
+        logger.error(f"Error querying vector database: {e}")
+        return "Sorry, I encountered an error while searching the knowledge base. Please try again."
 
 # -----------------------------
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 llm_with_tools = llm.bind_tools([query_vector_db])
 tools_by_name = {"query_vector_db": query_vector_db}
-l
+
 # -----------------------------
 # 3. Define nodes
 # -----------------------------
