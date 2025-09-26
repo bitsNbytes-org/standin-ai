@@ -106,32 +106,53 @@ def call_llm(state: AgentState) -> AgentState:
                 goodbye_message = "Thank you for the knowledge transfer session!  Goodbye!"
                 return {"messages": [AIMessage(content=goodbye_message)]}
     
-    initial_response = llm_with_tools.invoke(state["messages"])
+    # Get initial response with tools
+    response = llm_with_tools.invoke(state["messages"])
+    state["messages"].append(response)
+    
+    return state
 
-    if initial_response.tool_calls:
-        tool_call = initial_response.tool_calls[0]
+def execute_tool(state: AgentState) -> AgentState:
+    # Get the last message which should contain tool calls
+    last_message = state["messages"][-1]
+    
+    if hasattr(last_message, 'tool_calls') and last_message.tool_calls:
+        tool_call = last_message.tool_calls[0]
         tool_name = tool_call["name"]
         tool_input = tool_call["args"]
         tool_id = tool_call["id"]
         tool = tools_by_name[tool_name]
 
-        state["messages"].append(initial_response)
         print(f"Tool input: {tool_input}")
         tool_response = tool.invoke(tool_input)
         print(f"Tool response: {tool_response}")
 
-  # Get response from LLM
+        # Add tool response to messages
         state["messages"].append(ToolMessage(
-                content=json.dumps(tool_response),
-                tool_call_id=tool_id,
-            ))
-    structured_llm = llm.with_structured_output(Slide)
+            content=json.dumps(tool_response),
+            tool_call_id=tool_id,
+        ))
+    
+    return state
 
+def generate_final_response(state: AgentState) -> AgentState:
+    # Get structured response
+    structured_llm = llm.with_structured_output(Slide)
     final_response = structured_llm.invoke(state["messages"])
+    
     # Return the AI response
     # send_data_to_room(final_response.slide_number)
     print(f"final_response slide_number : {final_response.slide_number}")
     return {"messages": [AIMessage(content=final_response.text)]}
+
+def should_use_tools(state: AgentState) -> str:
+    """Conditional function to determine if tools should be used"""
+    last_message = state["messages"][-1]
+    
+    if hasattr(last_message, 'tool_calls') and last_message.tool_calls:
+        return "tools"
+    else:
+        return "final"
 
 
 
@@ -139,17 +160,31 @@ def prewarm(proc: JobProcess):
     proc.userdata["vad"] = silero.VAD.load()
 
 
-# a simple StateGraph with a single GPT-4o node
+# StateGraph with conditional edges for tool handling
 def create_graph() -> StateGraph:
 
     workflow = StateGraph(AgentState)
 
     workflow.add_node("start", start_node)
     workflow.add_node("llm_node", call_llm)
+    workflow.add_node("tool_node", execute_tool)
+    workflow.add_node("final_node", generate_final_response)
 
     workflow.set_entry_point("start")
     workflow.add_edge("start", "llm_node")
-    # For LiveKit agent, we don't need complex routing - just process each message
+    
+    # Add conditional edge from llm_node
+    workflow.add_conditional_edges(
+        "llm_node",
+        should_use_tools,
+        {
+            "tools": "tool_node",
+            "final": "final_node"
+        }
+    )
+    
+    # After tool execution, go to final response
+    workflow.add_edge("tool_node", "final_node")
     
     return workflow.compile()
 
