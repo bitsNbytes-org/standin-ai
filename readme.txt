@@ -1,15 +1,10 @@
-# StandIn.AI
+🌿 Repo Branches — StandIn.AI
 
-Create a virtual environment. 
-Activate it.
-Install all dependencies.
-Create a .env file referring to env.template file
-Run the agent using python3 main.py start/dev
+slack-bot
+Slack app that listens to mentions/DMs → retrieves context from Qdrant → answers using RAG + OpenAI.
 
-Install live kit server locally and generate the keys.
-Run the live kit server.
+ai-fast-api-app
+FastAPI backend that powers the content narration agent (case summaries, meeting notes, etc.).
 
-
-
-
-Use the credentials in the frontend react web application also to connect it with live kit server.
+room-connection
+Service for handling LiveKit room connections so the web frontend can join audio/video sessions.
