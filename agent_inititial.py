@@ -21,9 +21,12 @@ from livekit.agents import (
     WorkerOptions,
     cli,
 )
-from livekit.plugins import openai, langchain, silero
+from livekit.plugins import openai, langchain, silero, cartesia
 from livekit.plugins.turn_detector.multilingual import MultilingualModel
 from livekit.plugins import noise_cancellation
+from livekit import rtc
+from livekit.agents import ModelSettings, Agent
+from typing import Iterable
 
 logger = logging.getLogger("basic-agent")
 roomContext = None
@@ -32,7 +35,7 @@ load_dotenv()
 
 # pip install langchain langgraph openai
 
-
+roomContext = None
 # -----------------------------
 # 1. Define state
 # -----------------------------
@@ -47,7 +50,7 @@ class Slide(BaseModel):
 def query_vector_db(query: str) -> str:
     """Query the vector database for additional context"""
     return """
-ABC Pvt. Ltd. currently holds an estimated 2.5% of the global IT services market. Over the past five years, its market share has gradually increased from around 1.8% to 2.5%, reflecting steady growth in international client engagements and service offerings.""" 
+the food policy in keyvalue includes 3 free meals a week and one buffet dinner a month""" 
 
 # -----------------------------
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
@@ -63,25 +66,33 @@ def get_narration_plan():
         narration_plan.append(
             f"(Slide {slide['slide_number']})\nNarrator: {slide['narration_text']}\n"
         )
+    print(f"narration_plan : {narration_plan}")
     return "\n".join(narration_plan)
+
 def get_slide_json(slide_number: int):
     with open("output/presentation_data.json", "r", encoding="utf-8") as f:
         data = json.load(f)
     slides = data.get("slides", [])
-    return slides[int(slide_number)-1]["slide_json"] 
-def send_data_to_room(data: dict):
+    slide =  slides[int(slide_number)-1]["slide_json"] 
+    return slide
 
-    data_dict = {"type": "chat", "message": data, "sender": "agent"}
+
+def send_data_to_room(slide_number: int):
+
+    data_dict = {"type": "chat", "message": get_slide_json(slide_number), "sender": "agent"}
     json_data = json.dumps(data_dict)
-    json_bytes = json_data.encode('utf-8')
     room = roomContext.room
-    room.local_participant.publishData(json_bytes, reliable=True, topic="json")
+    room.local_participant.send_text("hello",topic='chat')
+
 # -----------------------------
 # 3. Define nodes
 # -----------------------------
 def start_node(state: AgentState) -> AgentState:
     # Initialize with empty messages - system messages are handled by prompt template
-    return {"messages": []}
+    return {"messages": [
+        SystemMessage(content=SYSTEM_PROMPT),
+        SystemMessage(content=f"NARRATION_PLAN:\n{get_narration_plan()}")
+    ]}
 
 
 def call_llm(state: AgentState) -> AgentState:
@@ -92,45 +103,36 @@ def call_llm(state: AgentState) -> AgentState:
             user_input = last_message.content.lower().strip()
             if user_input in ["exit", "quit", "bye", "goodbye", "end", "stop"]:
                 # Return a goodbye message and signal to exit
-                goodbye_message = "Thank you for the knowledge transfer session! I hope you found the information about the ABC Pvt. Ltd. HR policies helpful. Goodbye!"
+                goodbye_message = "Thank you for the knowledge transfer session!  Goodbye!"
                 return {"messages": [AIMessage(content=goodbye_message)]}
     
-    # Build the conversation with system prompt and narration plan
-    narration_plan = get_narration_plan()
-    conversation = [
-        SystemMessage(content=SYSTEM_PROMPT),
-        SystemMessage(content=f"NARRATION_PLAN:\n{narration_plan}")
-    ] + state["messages"]
-    print(state["messages"])
-    # Get response from LLM
-    response = llm_with_tools.invoke(conversation)
-    if response.tool_calls:
-        tool_call = response.tool_calls[0]
+    initial_response = llm_with_tools.invoke(state["messages"])
+
+    if initial_response.tool_calls:
+        tool_call = initial_response.tool_calls[0]
         tool_name = tool_call["name"]
         tool_input = tool_call["args"]
         tool_id = tool_call["id"]
         tool = tools_by_name[tool_name]
 
-        state["messages"].append(response)
+        state["messages"].append(initial_response)
         print(f"Tool input: {tool_input}")
         tool_response = tool.invoke(tool_input)
         print(f"Tool response: {tool_response}")
 
-        state["messages"].append(
-            ToolMessage(
+  # Get response from LLM
+        state["messages"].append(ToolMessage(
                 content=json.dumps(tool_response),
                 tool_call_id=tool_id,
-            )
-        )
-        
+            ))
     structured_llm = llm.with_structured_output(Slide)
-    response = structured_llm.invoke(state["messages"])
-    response_text = response.text
-    print("response", response_text)
 
-   
-    # send_data_to_room(get_slide_json(response.slide_number))
-    return {"messages": [AIMessage(content=response.text)]}
+    final_response = structured_llm.invoke(state["messages"])
+    # Return the AI response
+    # send_data_to_room(final_response.slide_number)
+    print(f"final_response slide_number : {final_response.slide_number}")
+    return {"messages": [AIMessage(content=final_response.text)]}
+
 
 
 def prewarm(proc: JobProcess):
@@ -158,15 +160,16 @@ async def entrypoint(ctx: JobContext):
     graph = create_graph()
 
     agent = Agent(
-        instructions="You are an AI agent providing knowledge transfer about ABC Pvt. Ltd. HR policies. Start by introducing yourself and the HR policy overview. If the user says 'exit', 'quit', 'bye', 'goodbye', 'end', or 'stop', respond with a polite goodbye and the session will end.",
+        instructions="",
         llm=langchain.LLMAdapter(graph),
     )
 
     session = AgentSession(
         vad=silero.VAD.load(),
         # any combination of STT, LLM, TTS, or realtime API can be used
-        stt=openai.STT(model="gpt-4o-mini-transcribe"),
-        tts=openai.TTS(model="gpt-4o-mini-tts"),
+        stt=openai.STT(model="gpt-4o-mini-transcribe", language="en"),
+        tts=openai.TTS(model="gpt-4o-mini-tts",instructions="DO NOT SAY THE SLIDE NUMBER IN YOUR RESPONSE. Speak in a cheerful, positive, and professional tone. Talk in a medium pace", voice="alloy"),
+        # tts = cartesia.TTS(model="sonic-2",voice="b911fa30-f9f2-45e0-8918-8671d24e61c8",api_key="sk_car_X1ffUzkFCuZRCtCKcXTDmH")
     )
 
     await session.start(
@@ -179,7 +182,7 @@ async def entrypoint(ctx: JobContext):
         ),
     )
     # Start the knowledge transfer session
-    await session.generate_reply(instructions="Welcome! I'm here to provide knowledge transfer about ABC Pvt. Ltd. HR policies. Let me start by giving you an overview of our HR framework. You can say 'exit' anytime to end this session.")
+    await session.generate_reply()
 
 
 if __name__ == "__main__":

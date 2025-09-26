@@ -133,7 +133,7 @@ Output Format:
 
 {
     "text": "text of the slide",
-    "sldx": "slide number"
+    "_sldx": "slide number"
 }
 """
 
@@ -148,7 +148,7 @@ def start_node(state: AgentState) -> AgentState:
 
 class Slide(BaseModel):
     text: str
-    sldx: int
+    _sldx: str
 
 def call_llm(state: AgentState) -> AgentState:
     # Check if user wants to exit
@@ -171,7 +171,7 @@ def call_llm(state: AgentState) -> AgentState:
     structured_llm = llm.with_structured_output(Slide)
     response = structured_llm.invoke(conversation)
     response_text = response.text
-    print("response_slide_number", response.sldx)
+    print("response_slide_number", response)
     # Return the AI response
     return {"messages": [AIMessage(content=response_text)]}
 
@@ -214,14 +214,15 @@ async def entrypoint(ctx: JobContext):
             # Slice the AsyncIterable to get first 5 characters
             
             async def slice_text_generator():
-                async for text_chunk in text:
-                   # if count < 5:  # Slice to first 5 characters
-                   
-                    print(f"Text chunk {count}: {text_chunk}")
-                    if 'sldx' not in text_chunk:
-                        yield text_chunk
-                    
                 
+                async for text_chunk in text:
+                    
+                    # If the current chunk contains "sldx", skip yielding anything and reset chunks
+                    if "_" in text_chunk:
+                        break
+                    else:
+                        yield text_chunk
+                        
             
             # Use the default TTS node for actual speech synthesis
             async for frame in Agent.default.tts_node(self, slice_text_generator(), model_settings):
