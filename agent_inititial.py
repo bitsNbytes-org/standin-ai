@@ -77,12 +77,13 @@ def get_slide_json(slide_number: int):
     return slide
 
 
-def send_data_to_room(slide_number: int):
+async def send_data_to_room(slide_number: int):
 
     data_dict = {"type": "chat", "message": get_slide_json(slide_number), "sender": "agent"}
-    json_data = json.dumps(data_dict)
+    data_dict = json.dumps(data_dict)
     room = roomContext.room
-    room.local_participant.send_text("hello",topic='chat')
+    await room.local_participant.send_text(data_dict,topic='chat')
+    print("Sent data to room")
 
 # -----------------------------
 # 3. Define nodes
@@ -135,13 +136,13 @@ def execute_tool(state: AgentState) -> AgentState:
     
     return state
 
-def generate_final_response(state: AgentState) -> AgentState:
+async def generate_final_response(state: AgentState) -> AgentState:
     # Get structured response
     structured_llm = llm.with_structured_output(Slide)
     final_response = structured_llm.invoke(state["messages"])
     
     # Return the AI response
-    # send_data_to_room(final_response.slide_number)
+    await send_data_to_room(final_response.slide_number)
     print(f"final_response slide_number : {final_response.slide_number}")
     return {"messages": [AIMessage(content=final_response.text)]}
 

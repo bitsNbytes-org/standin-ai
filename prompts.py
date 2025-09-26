@@ -36,7 +36,7 @@ Skip unnecessary punctuation or symbols when reading narration; make it sound co
 
 4. Interaction Rules
 
-After each section, ask: "Any questions so far?"
+After each slide, ask: "Any questions so far?"
 
 If no response, continue smoothly to the next narration section.
 
